@@ -12,7 +12,6 @@
             --btn-bg: #787878;
             --btn-border-light: #AAAAAA;
             --btn-border-dark: #222222;
-            --text-shadow: 2px 2px 0 #000;
         }
 
         * { box-sizing: border-box; }
@@ -20,35 +19,103 @@
         body {
             margin: 0; padding: 0;
             font-family: 'Press Start 2P', cursive;
-            overflow: hidden; /* Чтобы не было скролла на главном меню */
             background: #111;
             color: white;
             height: 100vh; width: 100vw;
+            overflow: hidden;
+            perspective: 800px;
             cursor: url('https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.19.3/assets/minecraft/textures/gui/sprites/hud/crosshair.png') 8 8, auto;
         }
 
-        /* --- ФОНОВАЯ ПАНОРАМА --- */
-        .panorama {
-            position: fixed; top: 0; left: 0; width: 110%; height: 110%;
-            background: url('https://media.forgecdn.net/attachments/304/412/title-screen.png') no-repeat center center;
-            background-size: cover;
-            filter: blur(4px) brightness(0.4);
+        /* --- 3D ПАНОРАМА (ОДНА КАРТИНКА) --- */
+        .panorama-container {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             z-index: -1;
-            animation: panMove 40s linear infinite alternate;
+            pointer-events: none;
         }
-        @keyframes panMove { from { transform: scale(1); } to { transform: scale(1.1); } }
 
-        /* --- ОБЩИЕ ЭКРАНЫ --- */
+        .panorama-cube {
+            width: 100%; height: 100%;
+            position: absolute;
+            transform-style: preserve-3d;
+            animation: rotateSkybox 60s linear infinite; /* Вращение */
+        }
+
+        .face {
+            position: absolute;
+            width: 1026px; height: 1026px; /* Чуть больше, чтобы скрыть швы */
+            top: 50%; left: 50%;
+            margin-top: -513px; margin-left: -513px;
+            
+            background-image: url('panorama.png'); /* ТВОЙ ФАЙЛ */
+            
+            /* Секрет: мы говорим браузеру, что картинка в 4 раза шире и в 3 раза выше грани */
+            background-size: 400% 300%; 
+            background-repeat: no-repeat;
+            backface-visibility: hidden;
+            image-rendering: pixelated; 
+        }
+
+        /* КООРДИНАТЫ ДЛЯ ТВОЕГО "КРЕСТА" */
+        
+        /* 0: FRONT (Колонка 1, Ряд 1) */
+        .face-front { 
+            transform: translateZ(512px) scaleX(-1); 
+            background-position: 33.333% 50%; 
+        }
+        
+        /* 1: RIGHT (Колонка 2, Ряд 1) */
+        .face-right { 
+            transform: rotateY(-90deg) translateZ(512px) scaleX(-1); 
+            background-position: 66.666% 50%; 
+        }
+        
+        /* 2: BACK (Колонка 3, Ряд 1) */
+        .face-back { 
+            transform: rotateY(180deg) translateZ(512px) scaleX(-1); 
+            background-position: 100% 50%; 
+        }
+        
+        /* 3: LEFT (Колонка 0, Ряд 1) */
+        .face-left { 
+            transform: rotateY(90deg) translateZ(512px) scaleX(-1); 
+            background-position: 0% 50%; 
+        }
+        
+        /* 4: UP (Колонка 1, Ряд 0 - ВЕРХ) */
+        .face-top { 
+            transform: rotateX(90deg) translateZ(512px) scaleX(-1) rotate(90deg); 
+            background-position: 33.333% 0%; 
+        }
+        
+        /* 5: DOWN (Колонка 1, Ряд 2 - НИЗ) */
+        .face-bottom { 
+            transform: rotateX(-90deg) translateZ(512px) scaleX(-1) rotate(-90deg); 
+            background-position: 33.333% 100%; 
+        }
+
+        @keyframes rotateSkybox {
+            0% { transform: rotateY(0deg) rotateX(0deg); }
+            100% { transform: rotateY(360deg) rotateX(0deg); }
+        }
+        
+        .overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4); /* Затемнение */
+            backdrop-filter: blur(3px); /* Размытие фона */
+            z-index: 0;
+        }
+
+        /* --- ИНТЕРФЕЙС --- */
         .screen {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             transition: opacity 0.3s;
-            overflow-y: auto; /* Скролл для контента */
-            padding: 20px;
+            padding: 20px; z-index: 2;
+            overflow-y: auto;
         }
         .hidden { opacity: 0; pointer-events: none; z-index: -100; display: none; }
 
-        /* --- ГЛАВНОЕ МЕНЮ --- */
         .logo {
             font-size: 40px; color: #FFF; text-shadow: 4px 4px 0 #3f3f3f;
             margin-bottom: 10px; text-align: center; line-height: 1.4;
@@ -61,38 +128,30 @@
         }
         @keyframes bounce { from { transform: rotate(-5deg) scale(1); } to { transform: rotate(-5deg) scale(1.1); } }
 
-        /* КНОПКИ МЕНЮ */
         .menu-btn {
-            position: relative;
-            width: 350px; padding: 15px; margin: 8px 0;
+            position: relative; width: 350px; padding: 15px; margin: 8px 0;
             background-color: var(--btn-bg);
             border: 2px solid #000;
             border-top-color: var(--btn-border-light); border-left-color: var(--btn-border-light);
             border-bottom-color: var(--btn-border-dark); border-right-color: var(--btn-border-dark);
             color: #DDD; font-family: 'Press Start 2P'; font-size: 14px;
-            text-shadow: 2px 2px 0 #222; text-align: center;
-            cursor: pointer; user-select: none;
+            text-shadow: 2px 2px 0 #222; text-align: center; cursor: pointer; user-select: none;
         }
         .menu-btn:hover { background-color: #888; color: #FFFF55; }
         .menu-btn:active { border-top-color: #222; border-left-color: #222; transform: translateY(2px); }
         
-        /* ЛЕНТА "В РАЗРАБОТКЕ" */
         .ribbon-wrapper { position: relative; display: inline-block; }
         .ribbon {
-            position: absolute; top: -5px; right: -5px;
-            background: #FF0000; color: white;
-            font-size: 8px; padding: 4px 8px;
-            transform: rotate(15deg);
-            box-shadow: 2px 2px 0 rgba(0,0,0,0.5);
-            border: 1px solid #FFF;
-            pointer-events: none; z-index: 10;
+            position: absolute; top: -5px; right: -5px; background: #FF0000; color: white;
+            font-size: 8px; padding: 4px 8px; transform: rotate(15deg);
+            box-shadow: 2px 2px 0 rgba(0,0,0,0.5); border: 1px solid #FFF; pointer-events: none; z-index: 10;
         }
         .btn-disabled { filter: grayscale(1); cursor: not-allowed; opacity: 0.8; }
 
-        /* --- ЭКРАН КЛАНОВ (CSS из прошлого ответа) --- */
+        /* Кланы и Правила */
         .clans-grid { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; margin-top: 20px; }
         .clan-card { background: rgba(0,0,0,0.7); border: 2px solid #555; padding: 15px; width: 320px; text-align: center; }
-        .clan-header { border-bottom: 2px solid #777; padding-bottom: 10px; margin-bottom: 15px; font-size: 16px; color: #FFAA00; }
+        .clan-header { border-bottom: 2px solid #777; padding-bottom: 10px; margin-bottom: 15px; font-size: 16px; }
         .members-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
         .member-item { 
             display: flex; flex-direction: column; align-items: center; 
@@ -104,35 +163,33 @@
         .member-name { font-size: 7px; word-break: break-all; }
         .crown { color: gold; font-size: 10px; margin-bottom: 2px; }
 
-        /* --- ЭКРАН ПРАВИЛ --- */
         .book-container {
-            background: #C6C6C6;
-            color: #000;
-            padding: 30px;
-            width: 90%; max-width: 600px;
-            border: 4px solid #000;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
-            text-shadow: none;
-            line-height: 1.6;
-            font-size: 10px;
-            margin-top: 20px;
+            background: #C6C6C6; color: #000; padding: 30px; width: 90%; max-width: 600px;
+            border: 4px solid #000; font-size: 10px; margin-top: 20px; line-height: 1.6;
             max-height: 80vh; overflow-y: auto;
         }
         .book-title { text-align: center; font-size: 18px; text-decoration: underline; margin-bottom: 20px; }
         .rule-item { margin-bottom: 15px; }
         .rule-num { font-weight: bold; color: #AA0000; }
-
-        /* КНОПКА НАЗАД */
-        .back-btn {
-            margin-top: 20px; width: 200px;
-        }
-        .footer { position: fixed; bottom: 10px; width: 100%; text-align: center; font-size: 8px; color: #777; pointer-events: none; }
-
+        .back-btn { margin-top: 20px; width: 200px; }
+        .footer { position: fixed; bottom: 10px; width: 100%; text-align: center; font-size: 8px; color: #777; pointer-events: none; z-index: 3;}
     </style>
 </head>
 <body>
 
-    <div class="panorama"></div>
+    <!-- ПАНОРАМА (Куб из одной картинки) -->
+    <div class="panorama-container">
+        <div class="panorama-cube">
+            <div class="face face-front"></div>
+            <div class="face face-back"></div>
+            <div class="face face-left"></div>
+            <div class="face face-right"></div>
+            <div class="face face-top"></div>
+            <div class="face face-bottom"></div>
+        </div>
+    </div>
+    
+    <div class="overlay"></div>
 
     <!-- 1. ГЛАВНОЕ МЕНЮ -->
     <div id="screen-menu" class="screen">
@@ -140,36 +197,31 @@
         <div class="splash-text" id="splash">Common World!</div>
 
         <div class="menu-btn" onclick="openScreen('screen-clans')">Кланы</div>
-        
         <div class="menu-btn" onclick="openScreen('screen-rules')">Правила</div>
-
-        <!-- Кнопка с лентой -->
+        
         <div class="ribbon-wrapper" onclick="alertMap()">
             <div class="ribbon">В РАЗРАБОТКЕ</div>
             <div class="menu-btn btn-disabled">Карта Мира</div>
         </div>
 
-        <div class="footer">Щербет & Potiron © 2026</div>
+        <div class="footer">Щербет & Potiron © 2024</div>
     </div>
 
     <!-- 2. ЭКРАН КЛАНОВ -->
     <div id="screen-clans" class="screen hidden">
         <h2 style="text-shadow: 2px 2px 0 #000;">СПИСОК КЛАНОВ</h2>
-        
         <div class="clans-grid">
             <!-- ЩЕРБЕТ -->
             <div class="clan-card" style="border-color: #FF99CC;">
                 <div class="clan-header" style="color: #FF99CC;">ЩЕРБЕТ</div>
                 <div class="members-list" id="list-sherbet"></div>
             </div>
-
             <!-- ТЫКВЫ -->
             <div class="clan-card" style="border-color: #FFAA00;">
                 <div class="clan-header" style="color: #FFAA00;">Le garde si Potiron</div>
                 <div class="members-list" id="list-pumpkin"></div>
             </div>
         </div>
-
         <button class="menu-btn back-btn" onclick="openScreen('screen-menu')">НАЗАД</button>
     </div>
 
@@ -177,109 +229,57 @@
     <div id="screen-rules" class="screen hidden">
         <div class="book-container">
             <div class="book-title">СВОД ЗАКОНОВ</div>
-            
-            <div class="rule-item">
-                <span class="rule-num">§1.</span> Гриферство запрещено в любых проявлениях. Восстановление за счет нарушителя.
-            </div>
-            <div class="rule-item">
-                <span class="rule-num">§2.</span> Уважение к другим кланам. Разрешены РП-конфликты, но не токсичность в чате.
-            </div>
-            <div class="rule-item">
-                <span class="rule-num">§3.</span> Использование читов (X-Ray, KillAura) карается баном навсегда.
-            </div>
-            <div class="rule-item">
-                <span class="rule-num">§4.</span> PvP только по обоюдному согласию или в зонах военных действий.
-            </div>
-            <div class="rule-item">
-                <span class="rule-num">§5.</span> Не ломать постройки на спавне.
-            </div>
+            <div class="rule-item"><span class="rule-num">§1.</span> Гриферство запрещено.</div>
+            <div class="rule-item"><span class="rule-num">§2.</span> Уважение к другим кланам.</div>
+            <div class="rule-item"><span class="rule-num">§3.</span> Использование читов = бан.</div>
+            <div class="rule-item"><span class="rule-num">§4.</span> PvP по согласию.</div>
             <p style="text-align: center; color: #555; margin-top: 20px;">* Незнание не освобождает от бана.</p>
         </div>
         <button class="menu-btn back-btn" onclick="openScreen('screen-menu')">НАЗАД</button>
     </div>
 
-    <!-- Звук клика -->
     <audio id="clickSound" src="https://www.myinstants.com/media/sounds/minecraft_click.mp3"></audio>
 
     <script>
-        /* --- ДАННЫЕ КЛАНОВ --- */
         const clans = {
             sherbet: [
-                { n: "Tetlabot", r: "member" },
-                { n: "Bagerca", r: "member" },
-                { n: "SheR", r: "quest" } // quest = под вопросом
+                { n: "Tetlabot", r: "member" }, { n: "Bagerca", r: "member" }, { n: "SheR", r: "quest" }
             ],
             pumpkin: [
-                { n: "Supdenix", r: "leader" },
-                { n: "Sanya", r: "leader" },
-                { n: "Bakonteamkg", r: "member" },
-                { n: "Uzbeek", r: "member" },
-                { n: "Tv_Alex574", r: "member" },
-                { n: "Zara_animations", r: "member" },
-                { n: "MMOSH", r: "member" },
-                { n: "Xlebomaker", r: "member" },
-                { n: "Amachan", r: "member" },
-                { n: "MigDag", r: "member" },
+                { n: "Supdenix", r: "leader" }, { n: "Sanya", r: "leader" },
+                { n: "Bakonteamkg", r: "member" }, { n: "Uzbeek", r: "member" },
+                { n: "Tv_Alex574", r: "member" }, { n: "Zara_animations", r: "member" },
+                { n: "MMOSH", r: "member" }, { n: "Xlebomaker", r: "member" },
+                { n: "Amachan", r: "member" }, { n: "MigDag", r: "member" },
                 { n: "Dorik2410", r: "member" }
             ]
         };
 
-        // Генерация сплеша (желтый текст)
-        const splashes = ["Common World!", "Tetlabot was here", "No Griefing!", "Creeper? Aww man", "Potiron Power"];
+        const splashes = ["Common World!", "Creeper? Aww man", "Potiron Power", "Look behind you!"];
         document.getElementById('splash').innerText = splashes[Math.floor(Math.random() * splashes.length)];
 
-        // Рендер игроков
         function renderMembers(listId, members) {
-            const container = document.getElementById(listId);
-            container.innerHTML = members.map(m => {
-                let note = m.r === 'leader' ? '<div class="crown">♕</div>' : '';
-                if(m.r === 'quest') note = '<div style="color:#AAA; font-size:6px;">?</div>';
-                
-                return `
-                <div class="member-item" onclick="window.open('https://namemc.com/profile/${m.n}', '_blank')">
-                    ${note}
-                    <img src="https://minotar.net/avatar/${m.n}/64.png" class="head-img" onerror="this.src='https://minotar.net/avatar/MHF_Steve/64.png'">
-                    <div class="member-name">${m.n}</div>
-                </div>`;
+            document.getElementById(listId).innerHTML = members.map(m => {
+                let note = m.r === 'leader' ? '<div class="crown">♕</div>' : (m.r === 'quest' ? '<div style="color:#AAA; font-size:6px;">?</div>' : '');
+                return `<div class="member-item" onclick="window.open('https://namemc.com/profile/${m.n}', '_blank')">
+                    ${note}<img src="https://minotar.net/avatar/${m.n}/64.png" class="head-img" onerror="this.src='https://minotar.net/avatar/MHF_Steve/64.png'"><div class="member-name">${m.n}</div></div>`;
             }).join('');
         }
-
         renderMembers('list-sherbet', clans.sherbet);
         renderMembers('list-pumpkin', clans.pumpkin);
 
-        /* --- НАВИГАЦИЯ --- */
         function openScreen(id) {
-            playSound();
-            // Скрыть все
+            const a = document.getElementById('clickSound'); a.currentTime=0; a.play().catch(()=>{});
             document.querySelectorAll('.screen').forEach(el => {
-                if(!el.classList.contains('hidden')) {
-                    el.style.opacity = '0';
-                    setTimeout(() => el.classList.add('hidden'), 200);
-                }
+                if(!el.classList.contains('hidden')) { el.style.opacity = '0'; setTimeout(() => el.classList.add('hidden'), 200); }
             });
-
-            // Показать нужный
             const target = document.getElementById(id);
-            setTimeout(() => {
-                target.classList.remove('hidden');
-                // Force reflow
-                void target.offsetWidth; 
-                target.style.display = 'flex';
-                target.style.opacity = '1';
-            }, 200);
+            setTimeout(() => { target.classList.remove('hidden'); void target.offsetWidth; target.style.display = 'flex'; target.style.opacity = '1'; }, 200);
         }
 
-        function alertMap() {
-            playSound();
-            // Можно заменить alert на красивый попап, но пока просто алерт
-            const splashes = ["Картограф запил...", "Спутники еще не запущены", "Крипер взорвал карту"];
-            alert("КАРТА НЕДОСТУПНА\nПричина: " + splashes[Math.floor(Math.random() * splashes.length)]);
-        }
-
-        function playSound() {
-            const audio = document.getElementById('clickSound');
-            audio.currentTime = 0;
-            audio.play().catch(e => {});
+        function alertMap() { 
+            const a = document.getElementById('clickSound'); a.currentTime=0; a.play().catch(()=>{});
+            alert("КАРТА НЕДОСТУПНА\nВедутся топографические работы..."); 
         }
     </script>
 </body>
