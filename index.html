@@ -3,599 +3,125 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Server Menu</title>
-    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.19.3/assets/minecraft/textures/block/grass_block_side.png">
+    <title>Minecraft Server Menu</title>
+    <!-- Иконка -->
+    <link rel="icon" type="image/png" href="https://assets.mcasset.cloud/1.20.4/assets/minecraft/textures/block/grass_block_side.png">
+    <!-- Шрифт -->
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-    
-    <style>
-        :root {
-            --btn-bg: #787878;
-            --btn-border-light: #AAAAAA;
-            --btn-border-dark: #222222;
-        }
-
-        * { 
-            margin: 0; 
-            padding: 0; 
-            box-sizing: border-box; 
-        }
-
-        body {
-            font-family: 'Press Start 2P', cursive;
-            background: #0b0b0b;
-            color: white;
-            height: 100vh;
-            width: 100vw;
-            overflow: hidden;
-            
-            /* РЕЗКИЕ ПИКСЕЛИ */
-            image-rendering: pixelated;
-            image-rendering: -moz-crisp-edges;
-            image-rendering: crisp-edges;
-
-            cursor: url('https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.19.3/assets/minecraft/textures/gui/sprites/hud/crosshair.png') 8 8, auto;
-        }
-
-        /* --- ФОН ИЗ БЛОКОВ --- */
-        #bgCanvas {
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-            z-index: -2;
-            image-rendering: pixelated;
-        }
-
-        .vignette-overlay {
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-            z-index: -1;
-            background: radial-gradient(circle, rgba(0,0,0,0.4) 20%, rgba(0,0,0,0.9) 100%);
-            pointer-events: none;
-        }
-
-        /* --- МЕНЮ --- */
-        .screen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: opacity 0.5s ease;
-            padding: 20px;
-            z-index: 1;
-        }
-
-        .hidden {
-            opacity: 0;
-            pointer-events: none;
-            display: none !important;
-        }
-
-        .logo-container {
-            text-align: center;
-            margin-bottom: 40px;
-            animation: float 3s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-        }
-
-        .logo {
-            font-size: 48px;
-            color: #FFF;
-            text-shadow: 
-                0 0 10px rgba(255,255,255,0.5),
-                0 0 20px rgba(255,170,0,0.3),
-                4px 4px 0 #3f3f3f,
-                6px 6px 0 #000;
-            margin-bottom: 10px;
-            line-height: 1.2;
-        }
-
-        .logo span {
-            color: #FFAA00;
-            text-shadow: 
-                0 0 10px rgba(255,170,0,0.5),
-                0 0 20px rgba(255,170,0,0.3),
-                4px 4px 0 #3f3f3f,
-                6px 6px 0 #000;
-        }
-
-        .splash-text {
-            color: #FFFF55;
-            font-size: 14px;
-            transform: rotate(-2deg);
-            text-shadow: 2px 2px 0 #333;
-            animation: pulse 2s infinite alternate;
-            margin: 20px 0 40px;
-            padding: 8px 16px;
-            background: rgba(0,0,0,0.3);
-            border: 2px solid rgba(255,255,85,0.3);
-            border-radius: 4px;
-        }
-
-        @keyframes pulse {
-            0% { transform: rotate(-2deg) scale(1); box-shadow: 0 0 5px rgba(255,255,85,0.5); }
-            100% { transform: rotate(-2deg) scale(1.05); box-shadow: 0 0 15px rgba(255,255,85,0.8); }
-        }
-
-        .menu-btn {
-            position: relative;
-            width: 350px;
-            padding: 18px;
-            margin: 10px 0;
-            background: linear-gradient(to bottom, #8b8b8b 0%, #787878 50%, #6a6a6a 100%);
-            border: 4px solid;
-            border-top-color: var(--btn-border-light);
-            border-left-color: var(--btn-border-light);
-            border-bottom-color: var(--btn-border-dark);
-            border-right-color: var(--btn-border-dark);
-            color: #FFF;
-            font-family: 'Press Start 2P';
-            font-size: 14px;
-            text-shadow: 2px 2px 0 #222;
-            text-align: center;
-            cursor: pointer;
-            user-select: none;
-            transition: all 0.2s ease;
-            box-shadow: 
-                inset 0 0 10px rgba(255,255,255,0.1),
-                0 4px 8px rgba(0,0,0,0.3);
-        }
-
-        .menu-btn:hover {
-            background: linear-gradient(to bottom, #9b9b9b 0%, #888888 50%, #7a7a7a 100%);
-            color: #FFFF55;
-            transform: translateY(-2px);
-            box-shadow: 
-                inset 0 0 15px rgba(255,255,255,0.2),
-                0 6px 12px rgba(0,0,0,0.4);
-        }
-
-        .menu-btn:active {
-            border-top-color: #222;
-            border-left-color: #222;
-            transform: translateY(1px);
-            box-shadow: 
-                inset 0 0 5px rgba(0,0,0,0.3),
-                0 2px 4px rgba(0,0,0,0.2);
-        }
-
-        .ribbon-wrapper {
-            position: relative;
-            display: inline-block;
-            margin: 10px 0;
-        }
-
-        .ribbon {
-            position: absolute;
-            top: -8px;
-            right: -15px;
-            background: linear-gradient(45deg, #FF0000, #FF5555);
-            color: white;
-            font-size: 9px;
-            padding: 5px 10px;
-            transform: rotate(15deg);
-            box-shadow: 2px 2px 0 rgba(0,0,0,0.5);
-            border: 1px solid #FFF;
-            pointer-events: none;
-            z-index: 10;
-            animation: ribbonPulse 1.5s infinite alternate;
-            text-shadow: 1px 1px 0 #000;
-        }
-
-        @keyframes ribbonPulse {
-            0% { transform: rotate(15deg) scale(1); }
-            100% { transform: rotate(15deg) scale(1.1); }
-        }
-
-        .btn-disabled {
-            filter: grayscale(0.8) brightness(0.7);
-            cursor: not-allowed;
-            opacity: 0.9;
-        }
-
-        .btn-disabled:hover {
-            transform: none !important;
-            background: linear-gradient(to bottom, #8b8b8b 0%, #787878 50%, #6a6a6a 100%) !important;
-            color: #FFF !important;
-        }
-
-        /* Кланы и Правила */
-        .clans-grid {
-            display: flex;
-            gap: 30px;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin: 30px 0;
-            max-width: 900px;
-        }
-
-        .clan-card {
-            background: rgba(0,0,0,0.85);
-            border: 4px solid;
-            padding: 20px;
-            width: 350px;
-            text-align: center;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
-            transition: all 0.3s ease;
-            border-radius: 8px;
-        }
-
-        .clan-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 30px rgba(0,0,0,0.6);
-        }
-
-        .clan-header {
-            border-bottom: 3px solid;
-            padding-bottom: 15px;
-            margin-bottom: 20px;
-            font-size: 18px;
-            text-shadow: 2px 2px 0 #000;
-        }
-
-        .members-list {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-        }
-
-        .member-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background: rgba(68, 68, 68, 0.9);
-            padding: 8px;
-            border: 2px solid #000;
-            cursor: pointer;
-            transition: all 0.2s;
-            border-radius: 5px;
-        }
-
-        .member-item:hover {
-            background: #666;
-            transform: scale(1.1);
-            z-index: 5;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-        }
-
-        .head-img {
-            width: 40px;
-            height: 40px;
-            image-rendering: pixelated;
-            margin-bottom: 8px;
-            border: 2px solid #000;
-            border-radius: 5px;
-        }
-
-        .member-name {
-            font-size: 9px;
-            word-break: break-all;
-            text-shadow: 1px 1px 0 #000;
-        }
-
-        .crown {
-            color: gold;
-            font-size: 12px;
-            margin-bottom: 3px;
-            text-shadow: 1px 1px 0 #000;
-            animation: crownGlow 2s infinite alternate;
-        }
-
-        @keyframes crownGlow {
-            0% { text-shadow: 0 0 5px gold; }
-            100% { text-shadow: 0 0 15px gold, 0 0 25px gold; }
-        }
-
-        .book-container {
-            background: linear-gradient(to bottom, #C6C6C6, #B0B0B0);
-            color: #000;
-            padding: 35px;
-            width: 90%;
-            max-width: 650px;
-            border: 6px solid #000;
-            font-size: 11px;
-            margin-top: 20px;
-            line-height: 1.7;
-            max-height: 75vh;
-            overflow-y: auto;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
-            border-radius: 10px;
-        }
-
-        .book-title {
-            text-align: center;
-            font-size: 20px;
-            text-decoration: underline;
-            margin-bottom: 25px;
-            color: #AA0000;
-            text-shadow: 2px 2px 0 #555;
-        }
-
-        .rule-item {
-            margin-bottom: 18px;
-            padding-left: 15px;
-            border-left: 4px solid #AA0000;
-            padding: 10px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 4px;
-        }
-
-        .rule-num {
-            font-weight: bold;
-            color: #AA0000;
-            margin-right: 10px;
-        }
-
-        .back-btn {
-            margin-top: 30px;
-            width: 220px;
-        }
-
-        .footer {
-            position: fixed;
-            bottom: 15px;
-            width: 100%;
-            text-align: center;
-            font-size: 10px;
-            color: #AAA;
-            pointer-events: none;
-            z-index: 2;
-            text-shadow: 1px 1px 0 #000;
-            background: rgba(0,0,0,0.5);
-            padding: 8px;
-            border-top: 2px solid rgba(255,255,255,0.1);
-        }
-
-        /* Анимации для скриншотов */
-        @keyframes fadeInUp {
-            from { 
-                opacity: 0; 
-                transform: translateY(30px); 
-            }
-            to { 
-                opacity: 1; 
-                transform: translateY(0); 
-            }
-        }
-
-        .screen:not(.hidden) {
-            animation: fadeInUp 0.5s ease-out;
-        }
-    </style>
+    <!-- Стили -->
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- ФОН (Генерация блоков) -->
+    <!-- ФОН -->
     <canvas id="bgCanvas"></canvas>
-    <div class="vignette-overlay"></div>
+    <div class="vignette"></div>
 
-    <!-- 1. ГЛАВНОЕ МЕНЮ -->
-    <div id="screen-menu" class="screen">
-        <div class="logo-container">
-            <div class="logo">MINECRAFT<br><span>SERVER</span></div>
-        </div>
-        <div class="splash-text" id="splash">Common World!</div>
-
-        <div class="menu-btn" onclick="openScreen('screen-clans')">Кланы</div>
-        <div class="menu-btn" onclick="openScreen('screen-rules')">Правила</div>
-        
-        <div class="ribbon-wrapper" onclick="alertMap()">
-            <div class="ribbon">В РАЗРАБОТКЕ</div>
-            <div class="menu-btn btn-disabled">Карта Мира</div>
-        </div>
-
-        <div class="footer">Щербет & Potiron © 2024 | v1.1.0</div>
-    </div>
-
-    <!-- 2. ЭКРАН КЛАНОВ -->
-    <div id="screen-clans" class="screen hidden">
-        <h2 style="text-shadow: 3px 3px 0 #000; margin-bottom: 20px;">СПИСОК КЛАНОВ</h2>
-        <div class="clans-grid">
-            <!-- ЩЕРБЕТ -->
-            <div class="clan-card" style="border-color: #FF99CC;">
-                <div class="clan-header" style="color: #FF99CC;">ЩЕРБЕТ</div>
-                <div class="members-list" id="list-sherbet"></div>
-            </div>
-            <!-- ТЫКВЫ -->
-            <div class="clan-card" style="border-color: #FFAA00;">
-                <div class="clan-header" style="color: #FFAA00;">Le garde si Potiron</div>
-                <div class="members-list" id="list-pumpkin"></div>
+    <!-- ТУЛТИП (Всплывающая анкета игрока) -->
+    <div id="player-tooltip" class="mc-tooltip">
+        <div class="tooltip-header">
+            <img src="" id="tt-head" class="tt-image" alt="head">
+            <div class="tt-info">
+                <div id="tt-name" class="tt-name">NickName</div>
+                <div id="tt-role" class="tt-role">Role</div>
             </div>
         </div>
-        <button class="menu-btn back-btn" onclick="openScreen('screen-menu')">НАЗАД</button>
+        <div id="tt-lore" class="tt-lore">Description...</div>
     </div>
 
-    <!-- 3. ЭКРАН ПРАВИЛ -->
-    <div id="screen-rules" class="screen hidden">
-        <div class="book-container">
-            <div class="book-title">СВОД ЗАКОНОВ СЕРВЕРА</div>
-            <div class="rule-item"><span class="rule-num">§1.</span> Гриферство запрещено. Уважайте постройки других игроков.</div>
-            <div class="rule-item"><span class="rule-num">§2.</span> Уважение к другим кланам. Межклановые войны только по согласию.</div>
-            <div class="rule-item"><span class="rule-num">§3.</span> Использование читов, дюпов и эксплойтов = перманентный бан.</div>
-            <div class="rule-item"><span class="rule-num">§4.</span> PvP разрешен только по обоюдному согласию игроков.</div>
-            <div class="rule-item"><span class="rule-num">§5.</span> Запрещено использование нецензурной лексики и оскорблений.</div>
-            <div class="rule-item"><span class="rule-num">§6.</span> Реклама других серверов и ресурсов строго запрещена.</div>
-            <div class="rule-item"><span class="rule-num">§7.</span> Уважайте администраторов и их решения.</div>
-            <div class="rule-item"><span class="rule-num">§8.</span> Помогайте новым игрокам, а не мешайте им.</div>
-            <p style="text-align: center; color: #555; margin-top: 25px; font-style: italic;">
-                * Незнание правил не освобождает от ответственности.<br>
-                * Нарушение правил влечет за собой бан в зависимости от тяжести нарушения.
-            </p>
-        </div>
-        <button class="menu-btn back-btn" onclick="openScreen('screen-menu')">НАЗАД</button>
-    </div>
-
-    <audio id="clickSound" src="https://www.myinstants.com/media/sounds/minecraft_click.mp3"></audio>
-
-    <script>
-        /* --- СКРИПТ ГЕНЕРАЦИИ ФОНА (РУДЫ) --- */
-        const canvas = document.getElementById('bgCanvas');
-        const ctx = canvas.getContext('2d');
-        ctx.imageSmoothingEnabled = false; 
-        ctx.mozImageSmoothingEnabled = false; 
-        ctx.webkitImageSmoothingEnabled = false;
-
-        const oreUrls = [
-            'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.19.3/assets/minecraft/textures/block/deepslate_coal_ore.png',
-            'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.19.3/assets/minecraft/textures/block/deepslate_copper_ore.png',
-            'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.19.3/assets/minecraft/textures/block/deepslate_diamond_ore.png',
-            'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.19.3/assets/minecraft/textures/block/deepslate_gold_ore.png',
-            'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.19.3/assets/minecraft/textures/block/deepslate_iron_ore.png',
-            'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.19.3/assets/minecraft/textures/block/deepslate_lapis_ore.png',
-            'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.19.3/assets/minecraft/textures/block/deepslate_redstone_ore.png',
-            'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.19.3/assets/minecraft/textures/block/deepslate_emerald_ore.png'
-        ];
+    <!-- ИНТЕРФЕЙС -->
+    <main class="ui-container">
         
-        const loadedImages = []; 
-        let imagesLoadedCount = 0;
+        <!-- ГЛАВНАЯ СТРАНИЦА -->
+        <section id="page-home" class="screen active">
+            <div class="logo-wrapper">
+                <h1 class="mc-logo">MINECRAFT</h1>
+                <h2 class="mc-subtitle">SERVER</h2>
+                <div class="splash-text" id="splashText">Loading chunks...</div>
+            </div>
 
-        // Загрузка изображений
-        oreUrls.forEach(url => {
-            const img = new Image(); 
-            img.crossOrigin = "Anonymous"; 
-            img.src = url;
-            img.onload = () => { 
-                loadedImages.push(img); 
-                imagesLoadedCount++; 
-                if (imagesLoadedCount === oreUrls.length) drawBackground(); 
-            };
-            img.onerror = () => { imagesLoadedCount++; };
-        });
-
-        function drawBackground() {
-            canvas.width = window.innerWidth; 
-            canvas.height = window.innerHeight;
-            ctx.imageSmoothingEnabled = false;
-            
-            const blockSize = 64; 
-            const cols = Math.ceil(canvas.width / blockSize);
-            const rows = Math.ceil(canvas.height / blockSize);
-            
-            for (let y = 0; y < rows; y++) {
-                for (let x = 0; x < cols; x++) {
-                    if (loadedImages.length > 0) {
-                        const randomImg = loadedImages[Math.floor(Math.random() * loadedImages.length)];
-                        if (randomImg) ctx.drawImage(randomImg, x * blockSize, y * blockSize, blockSize, blockSize);
-                    }
-                }
-            }
-        }
-        
-        window.addEventListener('resize', drawBackground);
-
-        /* --- ЛОГИКА МЕНЮ --- */
-        const clans = {
-            sherbet: [
-                { n: "Tetlabot", r: "member" }, 
-                { n: "Bagerca", r: "member" }, 
-                { n: "SheR", r: "quest" }
-            ],
-            pumpkin: [
-                { n: "Supdenix", r: "leader" }, 
-                { n: "Sanya", r: "leader" },
-                { n: "Bakonteamkg", r: "member" }, 
-                { n: "Uzbeek", r: "member" },
-                { n: "Tv_Alex574", r: "member" }, 
-                { n: "Zara_animations", r: "member" },
-                { n: "MMOSH", r: "member" }, 
-                { n: "Xlebomaker", r: "member" },
-                { n: "Amachan", r: "member" }, 
-                { n: "MigDag", r: "member" },
-                { n: "Dorik2410", r: "member" }
-            ]
-        };
-
-        const splashes = [
-            "Common World!", 
-            "Creeper? Aww man", 
-            "Potiron Power!", 
-            "Look behind you!",
-            "Щербет сладкий!",
-            "Keep inventory!",
-            "Пряничный домик!",
-            "Notch был здесь!",
-            "Собирайте тыквы!",
-            "Гриферы не пройдут!",
-            "Версия 1.19.3!",
-            "Без гриферов!",
-            "Добро пожаловать!",
-            "Приключения ждут!"
-        ];
-        
-        document.getElementById('splash').innerText = splashes[Math.floor(Math.random() * splashes.length)];
-
-        function renderMembers(listId, members) {
-            const listElement = document.getElementById(listId);
-            if (!listElement) return;
-            
-            listElement.innerHTML = members.map(m => {
-                let note = '';
-                if (m.r === 'leader') {
-                    note = '<div class="crown" title="Лидер клана">♕</div>';
-                } else if (m.r === 'quest') {
-                    note = '<div style="color:#AAA; font-size:8px; margin-bottom:3px;" title="Гость">[Гость]</div>';
-                }
+            <div class="menu-buttons">
+                <button class="mc-btn" onclick="app.navigate('page-clans')">Кланы</button>
+                <button class="mc-btn" onclick="app.navigate('page-rules')">Правила Войны</button>
                 
-                return `
-                    <div class="member-item" onclick="window.open('https://namemc.com/profile/${m.n}', '_blank')">
-                        ${note}
-                        <img src="https://minotar.net/avatar/${m.n}/64.png" 
-                             class="head-img" 
-                             alt="${m.n}"
-                             onerror="this.onerror=null; this.src='https://minotar.net/avatar/MHF_Steve/64.png'"
-                             title="${m.n}">
-                        <div class="member-name">${m.n}</div>
-                    </div>`;
-            }).join('');
-        }
+                <!-- Обертка для неактивной кнопки с лентой -->
+                <div class="btn-wrapper-disabled" onclick="app.playClick(); alert('🚧 Ведутся работы по картографии...')">
+                    <button class="mc-btn disabled">Карта Мира</button>
+                    <span class="ribbon">В РАЗРАБОТКЕ</span>
+                </div>
+            </div>
+        </section>
 
-        renderMembers('list-sherbet', clans.sherbet);
-        renderMembers('list-pumpkin', clans.pumpkin);
+        <!-- СТРАНИЦА КЛАНОВ -->
+        <section id="page-clans" class="screen">
+            <div class="clans-gui-window">
+                <div class="gui-header">СПИСОК ИГРОКОВ</div>
+                
+                <div class="clans-columns">
+                    <!-- ЩЕРБЕТ -->
+                    <div class="clan-column">
+                        <div class="clan-header pink-header">
+                            <div class="clan-title-row">
+                                <span class="clan-title">ЩЕРБЕТ</span>
+                                <span class="clan-count" id="count-sherbet">0</span>
+                            </div>
+                            <div class="clan-desc">
+                                "Сладость или гадость?"<br>
+                                Мастера инженерии и торговли.
+                            </div>
+                        </div>
+                        <div class="clan-grid" id="list-sherbet"></div>
+                    </div>
 
-        function openScreen(id) {
-            const clickSound = document.getElementById('clickSound');
-            clickSound.currentTime = 0;
-            clickSound.play().catch(e => console.log("Звук не воспроизведен:", e));
-            
-            document.querySelectorAll('.screen').forEach(el => {
-                if (!el.classList.contains('hidden')) {
-                    el.style.opacity = '0';
-                    setTimeout(() => {
-                        el.classList.add('hidden');
-                    }, 300);
-                }
-            });
-            
-            const target = document.getElementById(id);
-            setTimeout(() => {
-                target.classList.remove('hidden');
-                target.style.display = 'flex';
-                setTimeout(() => {
-                    target.style.opacity = '1';
-                }, 10);
-            }, 300);
-        }
+                    <div class="clan-separator"></div>
+                    
+                    <!-- POTIRON -->
+                    <div class="clan-column">
+                        <div class="clan-header orange-header">
+                            <div class="clan-title-row">
+                                <span class="clan-title">POTIRON</span>
+                                <span class="clan-count" id="count-pumpkin">0</span>
+                            </div>
+                            <div class="clan-desc">
+                                Le garde si Potiron<br>
+                                Хранители великих полей.
+                            </div>
+                        </div>
+                        <div class="clan-grid" id="list-pumpkin"></div>
+                    </div>
+                </div>
 
-        function alertMap() { 
-            const clickSound = document.getElementById('clickSound');
-            clickSound.currentTime = 0;
-            clickSound.play().catch(e => console.log("Звук не воспроизведен:", e));
+                <div class="gui-footer">
+                    <button class="mc-btn wide-btn" onclick="app.navigate('page-home')">Готово</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- СТРАНИЦА ПРАВИЛ (КНИГА) -->
+        <section id="page-rules" class="screen">
+            <!-- Фоновая картинка книги -->
+            <div class="book-background">
+                <!-- Область текста внутри книги -->
+                <div class="book-page">
+                    <h3 class="book-title">ПРАВИЛА ВЕДЕНИЯ ВОЙНЫ</h3>
+                    <div class="book-text" id="rules-content">
+                        <!-- Текст вставляется через JS -->
+                    </div>
+                </div>
+            </div>
             
-            alert("🗺️ КАРТА МИРА НЕДОСТУПНА\n\nВедутся топографические работы...\nОжидайте в следующем обновлении!"); 
-        }
-    </script>
+            <button class="mc-btn wide-btn" style="margin-top: 20px;" onclick="app.navigate('page-home')">Закрыть книгу</button>
+        </section>
+
+        <footer class="main-footer">
+            Site created by BAGERca © 2026
+        </footer>
+
+    </main>
+
+    <!-- Звук -->
+    <audio id="clickSound" src="https://www.myinstants.com/media/sounds/minecraft_click.mp3"></audio>
+    <!-- Скрипт -->
+    <script src="script.js"></script>
 </body>
 </html>
