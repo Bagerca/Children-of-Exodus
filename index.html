@@ -4,23 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Children of Exodus</title>
-    <!-- Иконка сайта -->
     <link rel="icon" type="image/png" href="https://assets.mcasset.cloud/1.20.4/assets/minecraft/textures/block/grass_block_side.png">
-    <!-- Шрифт Minecraft -->
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-    <!-- Стили -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- КАСТОМНЫЙ КУРСОР (Должен быть первым) -->
+    <!-- КАСТОМНЫЙ КУРСОР (Виден только на ПК) -->
     <div id="custom-cursor"></div>
 
     <!-- ФОН -->
     <canvas id="bgCanvas"></canvas>
     <div class="vignette"></div>
 
-    <!-- ТУЛТИП (Всплывающее окно) -->
+    <!-- ТУЛТИП (Всплывающее окно при наведении на ПК) -->
     <div id="player-tooltip" class="mc-tooltip">
         <div class="tooltip-header">
             <img src="" id="tt-head" class="tt-image" alt="head">
@@ -32,10 +29,23 @@
         <div id="tt-lore" class="tt-lore">Description...</div>
     </div>
 
-    <!-- ОСНОВНОЙ КОНТЕНТ -->
+    <!-- МОДАЛЬНОЕ ОКНО (Только для мобильных телефонов) -->
+    <div id="mobile-player-modal" class="mobile-modal-overlay">
+        <div class="mobile-modal-content">
+            <div class="modal-close" onclick="app.closeMobileModal()">×</div>
+            <img src="" id="mob-head" class="mob-head-img" alt="head">
+            <div id="mob-name" class="mob-name">NickName</div>
+            <div id="mob-role" class="mob-role">Role</div>
+            <div class="mob-separator"></div>
+            <div id="mob-lore" class="mob-lore">Lore text...</div>
+            <button class="mc-btn modal-btn" id="mob-link-btn">Открыть профиль</button>
+        </div>
+    </div>
+
+    <!-- ОСНОВНОЙ ИНТЕРФЕЙС -->
     <main class="ui-container">
         
-        <!-- ГЛАВНАЯ СТРАНИЦА -->
+        <!-- ГЛАВНАЯ -->
         <section id="page-home" class="screen active">
             <div class="logo-wrapper">
                 <h1 class="mc-logo">CHILDREN</h1>
@@ -54,7 +64,7 @@
             </div>
         </section>
 
-        <!-- СТРАНИЦА КЛАНОВ -->
+        <!-- КЛАНЫ -->
         <section id="page-clans" class="screen">
             <div class="clans-gui-window">
                 <div class="gui-header">СПИСОК ИГРОКОВ</div>
@@ -100,7 +110,7 @@
             </div>
         </section>
 
-        <!-- СТРАНИЦА ПРАВИЛ -->
+        <!-- ПРАВИЛА -->
         <section id="page-rules" class="screen">
             <div class="book-gui-custom">
                 <div class="book-content">
