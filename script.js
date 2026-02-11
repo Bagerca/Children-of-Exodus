@@ -3,17 +3,16 @@ const CONFIG = {
     clans: {
         sherbet: [
             { name: "Tetlabot", role: "Лидер", lore: "Основатель клана. Любит красный камень." },
-            { name: "Bagerca", role: "Создатель сайта", lore: "Разработчик этого меню. Архитектор." },
+            { name: "Bagerca", role: "Web Master", lore: "Создатель сайта и архитектор." },
             { name: "SheR", role: "Участник", lore: "Исследователь дальних земель." }
         ],
         pumpkin: [
             { name: "Supdenix", role: "Лидер", lore: "Король тыквенных полей и основатель ордена." },
-            { name: "Sanya", role: "Лидер / Адвокат", lore: "Класс: Евклид. Активен до 5 утра. Любит рыбалку, рисование и варить зелья. Аллергия на Незер." },
-            { name: "Zara_animations", role: "Строитель / ПвЕ", lore: "Забавный и добрый. Бывший ПвПшер. Любит рисовать и лепить. Ест всё, кроме печени." },
-            { name: "Inkdb", role: "Разведчик / Боец", lore: "Хороший шахтер и актер. Любит рисовать. Девиз: «Пиу-пау и ты сдох»." },
+            { name: "Sanya", role: "Лидер / Адвокат", lore: "Класс: Евклид. Аллергия на Незер." },
+            { name: "Zara_animations", role: "Строитель / ПвЕ", lore: "Забавный и добрый. Бывший ПвПшер. Любит рисовать и лепить." },
+            { name: "Inkdb", role: "Разведчик / Боец", lore: "Хороший шахтер. Девиз: «Пиу-пау и ты сдох»." },
             { name: "MigDag", role: "Участник", lore: "Мирный выживальщик. Принцип: Добро за добро." },
             
-            // Игроки без инфы - добавлена заглушка
             { name: "Bakonteamkg", role: "Участник", lore: "Информация засекречена." },
             { name: "Uzbeek", role: "Участник", lore: "Биография не известна." },
             { name: "Tv_Alex574", role: "Участник", lore: "Информация о субъекте отсутствует." },
@@ -22,24 +21,23 @@ const CONFIG = {
         ]
     },
     splashes: [
-        "Common World!", "Creeper? Aww man", "Potiron Power!", 
-        "Look behind you!", "Щербет сладкий!", "Keep inventory!", 
-        "Версия 1.20+", "Без гриферов!", "Заходи, не бойся!",
-        "BAGERca здесь был!", "Саня варит зелья!", "Тыквы захватят мир!"
+        "Children of Exodus!", "1.20.4!", "Слава Тыквам!", 
+        "Щербет - сила!", "Don't dig down!", "Herobrine removed", 
+        "Creeper? Aww man", "Сделано в 2026", "Без вайпов!",
+        "Заходи к нам!", "Hello World!", "Map in progress..."
     ],
-    // Текст правил войны (как на скрине)
     rulesText: `
-        <p><span class="rule-num">1.</span> Война будет начата если все стороны были уведомлены. Атакующая сторона обязана предоставить минимум <b>1 день</b> на подготовку. На защите базы обязаны присутствовать минимум 2 их владельца.</p>
+        <p><span class="rule-num">1.</span> Война будет начата если все стороны были уведомлены. Атакующая сторона обязана предоставить минимум <b>1 день</b> на подготовку.</p>
         
         <p><span class="rule-num">2.</span> Обязана быть причина для войны. Для объявления войны обязаны быть минимум <b>2 крупные причины</b>.</p>
         
-        <p><span class="rule-num">3.</span> Во время грифа/войны достопримечательности, которые не несут ценности, <b>не могут быть взорваны под 0</b>. Однако разрешается проверить их на наличие схронов (с условием восстановления) и сделать оскорбление (табличка, мусор).</p>
+        <p><span class="rule-num">3.</span> Во время грифа/войны достопримечательности, которые не несут ценности, <b>не могут быть взорваны под 0</b>. Однако разрешается проверить их на наличие схронов и сделать оскорбление.</p>
         
-        <p><span class="rule-num">4.</span> По окончанию войны обе стороны обязаны заключить <b>Пакт о ненападении</b>. Если проигравшие намеренно используют это право слишком долго — оно расторгается.</p>
+        <p><span class="rule-num">4.</span> По окончанию войны обе стороны обязаны заключить <b>Пакт о ненападении</b>.</p>
         
         <p><span class="rule-num">5.</span> Победившая сторона может наложить <b>репарации</b> (ресурсы) или забрать территорию.</p>
         
-        <p><span class="rule-num">6.</span> В случае несоблюдения правил — <b>БАН/КИК всей команды</b> по решению администратора (нужны доказательства вины всей команды, а не диверсанта).</p>
+        <p><span class="rule-num">6.</span> В случае несоблюдения правил — <b>БАН/КИК всей команды</b> по решению администратора.</p>
     `,
     ores: [
         'deepslate_coal_ore', 'deepslate_copper_ore', 'deepslate_diamond_ore',
@@ -52,7 +50,7 @@ const app = {
     init: function() {
         this.setupSplash();
         this.renderClans();
-        this.renderRules(); // Рендер правил
+        this.renderRules();
         background.init();
         tooltipSystem.init();
     },
@@ -87,20 +85,46 @@ const app = {
         splashEl.addEventListener('click', () => { this.playClick(); this.setupSplash(); });
     },
 
+    // ЛОГИКА ИКОНОК
+    getRoleIcon: function(role) {
+        const r = role.toLowerCase();
+        // Используем надежный CDN
+        const baseUrl = 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.1/assets/minecraft/textures/item/';
+        
+        let icon = 'paper.png'; 
+
+        if (r.includes('лидер') || r.includes('король')) icon = 'golden_helmet.png'; 
+        else if (r.includes('строитель') || r.includes('архитектор')) icon = 'iron_pickaxe.png'; 
+        else if (r.includes('боец') || r.includes('пвп') || r.includes('пве')) icon = 'diamond_sword.png'; 
+        else if (r.includes('адвокат')) icon = 'writable_book.png'; 
+        else if (r.includes('разведчик')) icon = 'spyglass.png'; 
+        else if (r.includes('web') || r.includes('сайт')) icon = 'redstone.png'; 
+        else if (r.includes('фермер')) icon = 'golden_hoe.png'; 
+        
+        return baseUrl + icon;
+    },
+
     renderClans: function() {
         const renderList = (id, countId, members) => {
             const container = document.getElementById(id);
             document.getElementById(countId).innerText = members.length;
-            container.innerHTML = members.map((player) => `
+            container.innerHTML = members.map((player) => {
+                const iconSrc = this.getRoleIcon(player.role);
+                return `
                 <div class="player-slot" 
                      onclick="window.open('https://namemc.com/profile/${player.name}', '_blank')"
                      data-name="${player.name}"
                      data-role="${player.role}"
                      data-lore="${player.lore}">
-                    <img src="https://minotar.net/avatar/${player.name}/32.png" class="player-head">
-                    <div class="player-info-mini"><div class="player-name">${player.name}</div></div>
+                     
+                    <div class="player-left">
+                        <img src="https://minotar.net/avatar/${player.name}/32.png" class="player-head">
+                        <div class="player-name">${player.name}</div>
+                    </div>
+                    
+                    <img src="${iconSrc}" class="role-icon" alt="role">
                 </div>
-            `).join('');
+            `}).join('');
         };
         renderList('list-sherbet', 'count-sherbet', CONFIG.clans.sherbet);
         renderList('list-pumpkin', 'count-pumpkin', CONFIG.clans.pumpkin);
@@ -111,7 +135,6 @@ const app = {
     }
 };
 
-/* СИСТЕМА ТУЛТИПОВ */
 const tooltipSystem = {
     el: document.getElementById('player-tooltip'),
     name: document.getElementById('tt-name'),
@@ -151,7 +174,6 @@ const tooltipSystem = {
     }
 };
 
-/* ГЕНЕРАТОР ФОНА (Без изменений) */
 const background = {
     canvas: document.getElementById('bgCanvas'),
     ctx: null, images: [], loadedCount: 0, blockSize: 64, gridPositions: [], isAnimating: false,

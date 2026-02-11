@@ -3,21 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minecraft Server Menu</title>
-    <!-- Иконка -->
+    <title>Children of Exodus</title>
     <link rel="icon" type="image/png" href="https://assets.mcasset.cloud/1.20.4/assets/minecraft/textures/block/grass_block_side.png">
-    <!-- Шрифт -->
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-    <!-- Стили -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- ФОН -->
     <canvas id="bgCanvas"></canvas>
     <div class="vignette"></div>
 
-    <!-- ТУЛТИП (Всплывающая анкета игрока) -->
     <div id="player-tooltip" class="mc-tooltip">
         <div class="tooltip-header">
             <img src="" id="tt-head" class="tt-image" alt="head">
@@ -29,14 +24,12 @@
         <div id="tt-lore" class="tt-lore">Description...</div>
     </div>
 
-    <!-- ИНТЕРФЕЙС -->
     <main class="ui-container">
         
-        <!-- ГЛАВНАЯ СТРАНИЦА -->
         <section id="page-home" class="screen active">
             <div class="logo-wrapper">
-                <h1 class="mc-logo">MINECRAFT</h1>
-                <h2 class="mc-subtitle">SERVER</h2>
+                <h1 class="mc-logo">CHILDREN</h1>
+                <h2 class="mc-subtitle">OF EXODUS</h2>
                 <div class="splash-text" id="splashText">Loading chunks...</div>
             </div>
 
@@ -44,7 +37,6 @@
                 <button class="mc-btn" onclick="app.navigate('page-clans')">Кланы</button>
                 <button class="mc-btn" onclick="app.navigate('page-rules')">Правила Войны</button>
                 
-                <!-- Обертка для неактивной кнопки с лентой -->
                 <div class="btn-wrapper-disabled" onclick="app.playClick(); alert('🚧 Ведутся работы по картографии...')">
                     <button class="mc-btn disabled">Карта Мира</button>
                     <span class="ribbon">В РАЗРАБОТКЕ</span>
@@ -52,13 +44,11 @@
             </div>
         </section>
 
-        <!-- СТРАНИЦА КЛАНОВ -->
         <section id="page-clans" class="screen">
             <div class="clans-gui-window">
                 <div class="gui-header">СПИСОК ИГРОКОВ</div>
                 
                 <div class="clans-columns">
-                    <!-- ЩЕРБЕТ -->
                     <div class="clan-column">
                         <div class="clan-header pink-header">
                             <div class="clan-title-row">
@@ -75,7 +65,6 @@
 
                     <div class="clan-separator"></div>
                     
-                    <!-- POTIRON -->
                     <div class="clan-column">
                         <div class="clan-header orange-header">
                             <div class="clan-title-row">
@@ -97,31 +86,26 @@
             </div>
         </section>
 
-        <!-- СТРАНИЦА ПРАВИЛ (КНИГА) -->
         <section id="page-rules" class="screen">
-            <!-- Фоновая картинка книги -->
-            <div class="book-background">
-                <!-- Область текста внутри книги -->
-                <div class="book-page">
-                    <h3 class="book-title">ПРАВИЛА ВЕДЕНИЯ ВОЙНЫ</h3>
-                    <div class="book-text" id="rules-content">
-                        <!-- Текст вставляется через JS -->
-                    </div>
+            <div class="book-gui-custom">
+                <div class="book-content">
+                    <div class="book-title">КОДЕКС ВОЙНЫ</div>
+                    <div class="book-text" id="rules-content"></div>
+                </div>
+                <div class="book-footer">
+                    <button class="gui-btn" onclick="app.navigate('page-home')">Done</button>
                 </div>
             </div>
-            
-            <button class="mc-btn wide-btn" style="margin-top: 20px;" onclick="app.navigate('page-home')">Закрыть книгу</button>
         </section>
 
+        <!-- ФУТЕР ВЫНЕСЕН ИЗ UI-CONTAINER ДЛЯ НАДЕЖНОСТИ (но с position fixed он и так будет внизу) -->
         <footer class="main-footer">
             Site created by BAGERca © 2026
         </footer>
 
     </main>
 
-    <!-- Звук -->
     <audio id="clickSound" src="https://www.myinstants.com/media/sounds/minecraft_click.mp3"></audio>
-    <!-- Скрипт -->
     <script src="script.js"></script>
 </body>
 </html>
